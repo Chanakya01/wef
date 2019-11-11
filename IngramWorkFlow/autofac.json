@@ -1,0 +1,48 @@
+{
+  "defaultAssembly": "IngramWorkFlow.MsSql",
+  "components": [
+    {
+      "type": "IngramWorkFlow.MsSql.SQLContext"
+    },
+    {
+      "type": "IngramWorkFlow.MsSql.Implementation.TicketRepository",
+      "services": [
+        {
+          "type": "IngramWorkFlow.Business.DataAccess.ITicketRepository, IngramWorkFlow.Business"
+        }
+      ]
+    },
+    {
+      "type": "IngramWorkFlow.MsSql.Implementation.UserRepository",
+      "services": [
+        {
+          "type": "IngramWorkFlow.Business.DataAccess.IUserRepository, IngramWorkFlow.Business"
+        }
+      ]
+    },
+    {
+      "type": "IngramWorkFlow.MsSql.Implementation.SettingsProvider",
+      "services": [
+        {
+          "type": "IngramWorkFlow.Business.DataAccess.ISettingsProvider, IngramWorkFlow.Business"
+        }
+      ]
+    },
+    {
+      "type": "IngramWorkFlow.MsSql.Implementation.PersistenceProviderContainer",
+      "services": [
+        {
+          "type": "IngramWorkFlow.Business.DataAccess.IPersistenceProviderContainer, IngramWorkFlow.Business"
+        }
+      ]
+    },
+    {
+      "type": "IngramWorkFlow.MsSql.Implementation.InboxRepository",
+      "services": [
+        {
+          "type": "IngramWorkFlow.Business.DataAccess.IInboxRepository, IngramWorkFlow.Business"
+        }
+      ]
+    }
+  ]
+}

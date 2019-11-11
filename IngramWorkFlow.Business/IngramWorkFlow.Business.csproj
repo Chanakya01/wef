@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="Workflow" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CSharp" Version="4.6.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.7.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="OptimaJet.Workflow.Core">
+      <HintPath>C:\Users\chanakya.dusi\.nuget\packages\workflowengine.netcore-core\4.0.1\lib\netstandard2.0\OptimaJet.Workflow.Core.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>

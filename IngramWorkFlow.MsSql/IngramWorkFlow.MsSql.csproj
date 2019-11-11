@@ -1,0 +1,34 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <OutputPath></OutputPath>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <OutputPath></OutputPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="8.0.0" />
+    <PackageReference Include="Microsoft.CSharp" Version="4.6.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="2.2.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="2.2.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
+    <PackageReference Include="WorkflowEngine.NETCore-ProviderForMSSQL" Version="4.0.9" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\IngramWorkFlow.Business\IngramWorkFlow.Business.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="OptimaJet.Workflow.Core">
+      <HintPath>..\..\..\..\..\workflow cracked\Workflow_Engine_for_.Net_Core_Enterprise_4.0.1_Downloadly.ir\Workflow Engine for .Net Core Enterprise 4.0.1\Crack\netstandard2.0\OptimaJet.Workflow.Core.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>
