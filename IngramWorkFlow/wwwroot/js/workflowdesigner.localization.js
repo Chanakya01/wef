@@ -43,10 +43,10 @@
 
     ActivityNamePrefix: 'Activity_',
     ActivityFormLabel: {
-        Title: 'Activity',
-        TitleForInline: 'Activity Inline',
+        Title: 'Task',
+        TitleForInline: 'Task Inline',
         Name: 'Name',
-        State: 'State',
+        State: 'Process State',
         IsInitial: 'Initial',
         IsFinal: 'Final',
         IsForSetState: 'For set state',
