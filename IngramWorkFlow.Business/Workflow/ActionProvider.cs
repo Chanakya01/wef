@@ -34,46 +34,28 @@ namespace IngramWorkFlow.Business.Workflow
             _dataServiceProvider = dataServiceProvider;
             //Register your actions in _actions and _asyncActions dictionaries
 //            _actions.Add("MyAction", MyAction); //sync
-            _asyncActions.Add("RuleCall", RuleCall); //async
-            _asyncActions.Add("SubWorkFlow", SubWorkFlow);
+          //  _asyncActions.Add("RuleCall", RuleCall); //async
+            //_asyncActions.Add("SubWorkFlow", SubWorkFlow);
             //Register your conditions in _conditions and _asyncConditions dictionaries
             //    _conditions.Add("Action_Condition", Action_Condition); //sync
-            _asyncConditions.Add("Rule_Condition", Rule_Condition); //async
-            _asyncConditions.Add("sample", Sample);
-            _conditions.Add("WaitForSubWorkFlow", WaitForSubWorkFlow);
+            _asyncActions.Add("Logic_Notifications", Logic_Notifications); //async
+            _asyncConditions.Add("Logic_Decision", Logic_Decision);
+            //_conditions.Add("WaitForSubWorkFlow", WaitForSubWorkFlow);
             
         }
-        private bool WaitForSubWorkFlow(ProcessInstance processInstance, WorkflowRuntime runtime, string actionParameter)
-        {
-            string id = processInstance.GetParameter("wait").Value.ToString();
-            using (SqlConnection connection = new SqlConnection("Server=tcp:camsazure.database.windows.net,1433;Initial Catalog=camsdatabase;Persist Security Info=False;User ID=chanakya;Password=Jahnavi@01;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"))
-            {
-                while (true)
-                {
-                    SqlCommand command = new SqlCommand(string.Format("SELECT [Status] FROM [dbo].[WorkflowProcessInstanceStatus] where id = '{0}'", id), connection);
-                    command.Connection.Open();
-                    SqlDataReader sqlDataReader = command.ExecuteReader();
-                    while (sqlDataReader.Read())
-                    {
-                        var f = sqlDataReader["Status"].ToString();
-                        if (f == "2")
-                        {
-                            return true;
-                        }
-                        Console.WriteLine("wait");
-                    }
-                    sqlDataReader.Close();
-                    command.Connection.Close();
-                }
-            }
-        }
-        private async Task<bool> Sample(ProcessInstance processInstance, WorkflowRuntime runtime, string actionParameter, CancellationToken token)
+   
+        private async Task<bool> Logic_Decision(ProcessInstance processInstance, WorkflowRuntime runtime, string actionParameter, CancellationToken token)
         {
             dynamic para = JsonConvert.DeserializeObject(actionParameter);
-            if (para.input == true)
-                return false;
-            else
+            string notify = processInstance.GetParameter("resnotify").Value.ToString();
+            dynamic jvalidate = JsonConvert.DeserializeObject(notify);
+            //if (jvalidate.sorT_Notification.Contains(para.decision))
+            //    return true;
+            string redd = jvalidate.sorT_Notification;
+            string com = para.decision;
+            if (redd.Contains(com))
                 return true;
+            return false;
         }
 
         private void MyAction(ProcessInstance processInstance, WorkflowRuntime runtime,
@@ -82,65 +64,88 @@ namespace IngramWorkFlow.Business.Workflow
             //Execute your synchronous code here
         }
 
-
-
-        private async Task<bool> SubWorkFlow(ProcessInstance processInstance, WorkflowRuntime runtime, string actionParameter, CancellationToken token)
-        {
-            //Execute your asynchronous code here. You can use await in your code.
-            using (var client = new HttpClient())
-            {
-                dynamic parameter = JsonConvert.DeserializeObject(actionParameter);
-                client.DefaultRequestHeaders.Accept.Clear();
-                string url = string.Format("http://localhost:5000/createFlow?schemeCode={0}", parameter.Scheme);
-                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                var content = JsonConvert.SerializeObject(parameter.Input);
-                var stringContent = new StringContent(content, Encoding.UTF8, "application/json");
-                HttpResponseMessage response = await client.PostAsync(url,stringContent);
-                 if (response != null)
-                {
-                    string sta = await response.Content.ReadAsStringAsync();
-                    processInstance.SetParameter("wait", sta);
-                    return true;
-                }
-                
-            }
-
-            return false;
-        }
-
-        //private bool Action_Condition(ProcessInstance processInstance, WorkflowRuntime runtime, string actionParameter)
+        //private async Task<bool> SubWorkFlow(ProcessInstance processInstance, WorkflowRuntime runtime, string actionParameter, CancellationToken token)
         //{
+        //    //Execute your asynchronous code here. You can use await in your code.
+        //    using (var client = new HttpClient())
+        //    {
+        //        dynamic parameter = JsonConvert.DeserializeObject(actionParameter);
+        //        client.DefaultRequestHeaders.Accept.Clear();
+        //        string url = string.Format("http://localhost:5000/createFlow?schemeCode={0}", parameter.Scheme);
+        //        client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+        //        var content = JsonConvert.SerializeObject(parameter.Input);
+        //        var stringContent = new StringContent(content, Encoding.UTF8, "application/json");
+        //        HttpResponseMessage response = await client.PostAsync(url,stringContent);
+        //         if (response != null)
+        //        {
+        //            string sta = await response.Content.ReadAsStringAsync();
+        //            processInstance.SetParameter("wait", sta);
+        //            return true;
+        //        }
+
+        //    }
 
         //    return false;
         //}
 
-        private async Task RuleCall(ProcessInstance processInstance, WorkflowRuntime runtime, string actionParameter, CancellationToken token)
-        {
-            using (var client = new HttpClient())
-            {
-                client.BaseAddress = new Uri("https://inferenceapi.azurewebsites.net/api/Inference");
-                client.DefaultRequestHeaders.Accept.Clear();
-                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                HttpResponseMessage response = await client.GetAsync("");
-                actionParameter = response.RequestMessage.Properties.Values.ToString();
-            }
-            //Execute your asynchronous code here. You can use await in your code.
-        }
 
-        private async Task<bool> Rule_Condition(ProcessInstance processInstance, WorkflowRuntime runtime, string actionParameter, CancellationToken token)
+        //private async Task RuleCall(ProcessInstance processInstance, WorkflowRuntime runtime, string actionParameter, CancellationToken token)
+        //{
+        //    using (var client = new HttpClient())
+        //    {
+        //        client.BaseAddress = new Uri("https://inferenceapi.azurewebsites.net/api/Inference");
+        //        client.DefaultRequestHeaders.Accept.Clear();
+        //        client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+        //        HttpResponseMessage response = await client.GetAsync("");
+        //        actionParameter = response.RequestMessage.Properties.Values.ToString();
+        //    }
+        //    //Execute your asynchronous code here. You can use await in your code.
+        //}
+        private async Task<bool> Logic_Notifications(ProcessInstance processInstance, WorkflowRuntime runtime, string actionParameter, CancellationToken token)
         {
-            //Execute your asynchronous code here. You can use await in your code.
             using (var client = new HttpClient())
             {
-                client.BaseAddress = new Uri("https://inferenceapi.azurewebsites.net/api/Inference");
                 client.DefaultRequestHeaders.Accept.Clear();
+                string url = "https://inferenceapi.azurewebsites.net/api/Inference";
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                HttpResponseMessage response = await client.GetAsync("");
-                actionParameter = response.RequestMessage.Properties.Values.ToString();
+                var stringContent = new StringContent(actionParameter, Encoding.UTF8, "application/json");
+                HttpResponseMessage response = await client.PostAsync(url, stringContent);
+                if (response != null)
+                {
+                    string res = await response.Content.ReadAsStringAsync();
+                    processInstance.SetParameter("resnotify",res);                                        
+                    return true;
+                }
             }
-            
             return false;
         }
+        //private bool WaitForSubWorkFlow(ProcessInstance processInstance, WorkflowRuntime runtime, string actionParameter)
+        //{
+        //    string stid = processInstance.GetParameter("wait").Value.ToString();
+        //    stid = stid.Replace("\"", string.Empty);
+        //    Guid id = new Guid();
+        //    var r = Guid.TryParse(stid,out id);
+        //    using (SqlConnection connection = new SqlConnection("Server=tcp:camsazure.database.windows.net,1433;Initial Catalog=camsdatabase;Persist Security Info=False;User ID=chanakya;Password=Jahnavi@01;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"))
+        //    {
+        //        while (true)
+        //        {
+        //            SqlCommand command = new SqlCommand(string.Format("SELECT [Status] FROM [dbo].[WorkflowProcessInstanceStatus] where id = '{0}'", id), connection);
+        //            command.Connection.Open();
+        //            SqlDataReader sqlDataReader = command.ExecuteReader();
+        //            while (sqlDataReader.Read())
+        //            {
+        //                var f = sqlDataReader["Status"].ToString();
+        //                if (f == "2")
+        //                {
+        //                    return true;
+        //                }
+        //                Console.WriteLine("wait");
+        //            }
+        //            sqlDataReader.Close();
+        //            command.Connection.Close();
+        //        }
+        //    }
+        //}
 
         #region Implementation of IWorkflowActionProvider
 
@@ -203,81 +208,85 @@ namespace IngramWorkFlow.Business.Workflow
 
         #endregion
     }
-    public class resattribute
-    {
-        public string LOB { get; set; }
-        public string Category_Classification { get; set; }
-        public string Class { get; set; }
-        public string Category { get; set; }
-        public string Make { get; set; }
-        public string Model { get; set; }
-        public string Part { get; set; }
-        public string UPC { get; set; }
-        public string AR { get; set; }
-        public string FMV { get; set; }
-        public string Purchase_Cost { get; set; }
-        public string Tenant_Name { get; set; }
-        public string Source_Name { get; set; }
-        public string Source_Group_Name { get; set; }
-        public string Job{get; set;}
-        public string Load_ID { get; set; }
-        public string Quarantine_Load {get; set;}
-        public string Screen_Size { get; set; }
-        public string Screen_Type { get; set; }
-        public string Optical_Drive { get; set; }
-        public string HDD_Connector_Type { get; set; }
-        public string Note_Book_Type { get; set; }
-        public string Max_Core { get; set; }
-        public string Processor_Qty { get; set; }
-        public string System_Type { get; set; }
-        public string PagesMin{get; set;}
-        public string Pages_Printed_ { get; set; }
-        public string Printer_Type { get; set; }
-        public string Color { get; set; }
-        public string Product_Type { get; set; }
-        public string Processor_Name { get; set; }
-        public string Monitor_Type { get; set; }
-        public string Processor_Speed { get; set; }
-public string Message_to_Decon { get; set; }
-public string Move_To_Recycle { get; set; }
-public string HDD_Size { get; set; }
-public string HDD_Speed { get; set; }
-public string Memory { get; set; }
-public string Legal_Hold { get; set; }
-public string Ownership_Type { get; set; }
-public string Country { get; set; }
-public string Override_Reason { get; set; }
-public string Source_Locations { get; set; }
-public string Bad_Cap { get; set; }
-public string Apply_rule_to_All_Child_Companies { get; set; }
-public string Facility { get; set; }
-public string Brown_Box { get; set; }
-public string Functional_Status { get; set; }
-public string Cosmetic_Grade { get; set; }
-public string Asset_Age { get; set; }
-public string Source_Disposition { get; set; }
-public string New_In_Box { get; set; }
-public string Job_Type { get; set; }
-public string Leased_Assets_Processed_As { get; set; }
-public string BER_Threshold_Remaining { get; set; }
-public string COGS { get; set; }
-public string Warranty { get; set; }
 
-public string Off_Leased_Asset { get; set; }
-public string Exclude_Cosmetic_Reason { get; set; }
-public string Site_ID { get; set; }
-public string Quantity { get; set; }
-public string PRODUCTION_Site_Lock { get; set; }
-public string RECYCLE_Site_Lock { get; set; }
-public string SORT_Site_Lock { get; set; }
-public string Quarantine_Site_Lock { get; set; }
-public string KITTING_Site_Lock { get; set; }
-public string DATA_ERASURE_Site_Lock { get; set; }
-public string CLEAN_AND_PREP_Site_Lock { get; set; }
-public string REFURBISH_Site_Lock { get; set; }
-public string FGLEGAL_HOLD_Site_Lock{get; set;}
-public string DCT_Site_Lock { get; set; }
-public string IMAGINGCLIENT_Site_Lock{get; set;}
-    }
+
+
+
+//    public class resattribute
+//    {
+//        public string LOB { get; set; }
+//        public string Category_Classification { get; set; }
+//        public string Class { get; set; }
+//        public string Category { get; set; }
+//        public string Make { get; set; }
+//        public string Model { get; set; }
+//        public string Part { get; set; }
+//        public string UPC { get; set; }
+//        public string AR { get; set; }
+//        public string FMV { get; set; }
+//        public string Purchase_Cost { get; set; }
+//        public string Tenant_Name { get; set; }
+//        public string Source_Name { get; set; }
+//        public string Source_Group_Name { get; set; }
+//        public string Job{get; set;}
+//        public string Load_ID { get; set; }
+//        public string Quarantine_Load {get; set;}
+//        public string Screen_Size { get; set; }
+//        public string Screen_Type { get; set; }
+//        public string Optical_Drive { get; set; }
+//        public string HDD_Connector_Type { get; set; }
+//        public string Note_Book_Type { get; set; }
+//        public string Max_Core { get; set; }
+//        public string Processor_Qty { get; set; }
+//        public string System_Type { get; set; }
+//        public string PagesMin{get; set;}
+//        public string Pages_Printed_ { get; set; }
+//        public string Printer_Type { get; set; }
+//        public string Color { get; set; }
+//        public string Product_Type { get; set; }
+//        public string Processor_Name { get; set; }
+//        public string Monitor_Type { get; set; }
+//        public string Processor_Speed { get; set; }
+//public string Message_to_Decon { get; set; }
+//public string Move_To_Recycle { get; set; }
+//public string HDD_Size { get; set; }
+//public string HDD_Speed { get; set; }
+//public string Memory { get; set; }
+//public string Legal_Hold { get; set; }
+//public string Ownership_Type { get; set; }
+//public string Country { get; set; }
+//public string Override_Reason { get; set; }
+//public string Source_Locations { get; set; }
+//public string Bad_Cap { get; set; }
+//public string Apply_rule_to_All_Child_Companies { get; set; }
+//public string Facility { get; set; }
+//public string Brown_Box { get; set; }
+//public string Functional_Status { get; set; }
+//public string Cosmetic_Grade { get; set; }
+//public string Asset_Age { get; set; }
+//public string Source_Disposition { get; set; }
+//public string New_In_Box { get; set; }
+//public string Job_Type { get; set; }
+//public string Leased_Assets_Processed_As { get; set; }
+//public string BER_Threshold_Remaining { get; set; }
+//public string COGS { get; set; }
+//public string Warranty { get; set; }
+
+//public string Off_Leased_Asset { get; set; }
+//public string Exclude_Cosmetic_Reason { get; set; }
+//public string Site_ID { get; set; }
+//public string Quantity { get; set; }
+//public string PRODUCTION_Site_Lock { get; set; }
+//public string RECYCLE_Site_Lock { get; set; }
+//public string SORT_Site_Lock { get; set; }
+//public string Quarantine_Site_Lock { get; set; }
+//public string KITTING_Site_Lock { get; set; }
+//public string DATA_ERASURE_Site_Lock { get; set; }
+//public string CLEAN_AND_PREP_Site_Lock { get; set; }
+//public string REFURBISH_Site_Lock { get; set; }
+//public string FGLEGAL_HOLD_Site_Lock{get; set;}
+//public string DCT_Site_Lock { get; set; }
+//public string IMAGINGCLIENT_Site_Lock{get; set;}
+//    }
 }
 
