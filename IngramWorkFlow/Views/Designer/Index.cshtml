@@ -19,13 +19,13 @@
         <a href="javascript:SelectScheme('wfe')" class="ui secondary button">Upload XML</a>
         <a href="javascript:DownloadSchemeBPMN()" class="ui secondary button">Download BPMN2</a>
         <a href="javascript:SelectScheme('bpmn')" class="ui secondary button">Upload BPMN2</a>*@
-        schemeName: <input type="text" name="schemeName" id="schemeName" />
+        @*schemeName: <input type="text" name="schemeName" id="schemeName" />*@
     </div>
     <input type="file" name="uploadFile" id="uploadFile" style="display:none" onchange="javascript: UploadScheme();">
     
   
 </form>
-<a href="javascript:onLoad()" class="ui secondary button">Load</a>
+@*<a href="javascript:onLoad()" class="ui secondary button">Load</a>*@
 <div id="wfdesigner" style="min-height:600px"></div>
 
 <script>
@@ -52,7 +52,7 @@
         return query_string;
     }();
 
-    var schemecode = "Pickup";
+    var schemecode = QueryString.schemeName;
     var processid = QueryString.processid;
     var graphwidth = 1200;
     var graphminheight = 600;
@@ -169,13 +169,13 @@ function OnSave() {
 function OnNew() {
     wfdesigner.create();
     }
-    function onLoad() {
-        debugger;
-        var scheme = document.getElementById('schemeName').value;
-        var p = { schemecode: scheme, processid: null, readonly: false };
-        if (wfdesigner.exists(p))
-            wfdesigner.load(p);
-        else
-            wfdesigner.create();
-    }
+    //function onLoad() {
+    //    debugger;
+    //    var scheme = document.getElementById('schemeName').value;
+    //    var p = { schemecode: scheme, processid: null, readonly: false };
+    //    if (wfdesigner.exists(p))
+    //        wfdesigner.load(p);
+    //    else
+    //        wfdesigner.create();
+    //}
 </script>

@@ -45,7 +45,7 @@ namespace IngramWorkFlow.MsSql.Implementation
         }
         public dynamic GetSchemes()
         {
-            return _sqlContext.WorkflowSchemes.ToList();
+            return _sqlContext.WorkflowSchemes.Select(x => new { Code = x.Code });
         }
     }
 }
