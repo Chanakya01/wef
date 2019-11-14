@@ -14,12 +14,12 @@
 <form action="" id="uploadform" method="post" enctype="multipart/form-data" onsubmit="tmp()" style="padding-bottom: 8px;">
     <div id="hide">
         <a href="javascript:OnNew()" class="ui secondary button">Clear All</a>
-        @*<a href="javascript:OnSave()" class="ui secondary button">Save scheme</a>*@
+        <a href="javascript:OnSave()" class="ui secondary button">Save Workflow</a>
         @*<a href="javascript:DownloadScheme()" class="ui primary button">Download XML</a>
         <a href="javascript:SelectScheme('wfe')" class="ui secondary button">Upload XML</a>
         <a href="javascript:DownloadSchemeBPMN()" class="ui secondary button">Download BPMN2</a>
         <a href="javascript:SelectScheme('bpmn')" class="ui secondary button">Upload BPMN2</a>*@
-        WorkFlow Name: <input type="text" name="schemeName" id="schemeName" />
+        WorkFlow Name: <input type="text" name="schemeName"  id="schemeName" />
     </div>
     <input type="file" name="uploadFile" id="uploadFile" style="display:none" onchange="javascript: UploadScheme();">
     
@@ -28,8 +28,7 @@
 @*<a href="javascript:onLoad()" class="ui secondary button">Load</a>*@
 <div id="wfdesigner" style="min-height:600px"></div>
 
-<script>
-    var QueryString = function () {
+<script>var QueryString = function () {
         // This function is anonymous, is executed immediately and
         // the return value is assigned to QueryString!
         var query_string = {};
@@ -51,7 +50,7 @@
         }
         return query_string;
     }();
-
+    document.getElementById('schemeName').value = QueryString.schemeName;
     var schemecode = QueryString.schemeName;
     var processid = QueryString.processid;
     var graphwidth = 1200;
@@ -59,7 +58,7 @@
     var graphheight = graphminheight;
 
     var wfdesigner = undefined;
-    
+
     function wfdesignerRedraw() {
         var data;
 
@@ -177,5 +176,4 @@ function OnNew() {
     //        wfdesigner.load(p);
     //    else
     //        wfdesigner.create();
-    //}
-</script>
+    //}</script>
