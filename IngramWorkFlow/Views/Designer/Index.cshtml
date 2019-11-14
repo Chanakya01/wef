@@ -13,13 +13,13 @@
 
 <form action="" id="uploadform" method="post" enctype="multipart/form-data" onsubmit="tmp()" style="padding-bottom: 8px;">
     <div id="hide">
-        <a href="javascript:OnNew()" class="ui secondary button">New scheme</a>
-        <a href="javascript:OnSave()" class="ui secondary button">Save scheme</a>
+        <a href="javascript:OnNew()" class="ui secondary button">Clear All</a>
+        @*<a href="javascript:OnSave()" class="ui secondary button">Save scheme</a>*@
         @*<a href="javascript:DownloadScheme()" class="ui primary button">Download XML</a>
         <a href="javascript:SelectScheme('wfe')" class="ui secondary button">Upload XML</a>
         <a href="javascript:DownloadSchemeBPMN()" class="ui secondary button">Download BPMN2</a>
         <a href="javascript:SelectScheme('bpmn')" class="ui secondary button">Upload BPMN2</a>*@
-        schemeName: <input type="text" name="schemeName" id="schemeName" />
+        WorkFlow Name: <input type="text" name="schemeName" id="schemeName" />
     </div>
     <input type="file" name="uploadFile" id="uploadFile" style="display:none" onchange="javascript: UploadScheme();">
     
