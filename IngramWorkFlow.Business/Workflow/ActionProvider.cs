@@ -33,14 +33,19 @@ namespace IngramWorkFlow.Business.Workflow
         {
             _dataServiceProvider = dataServiceProvider;
             //Register your actions in _actions and _asyncActions dictionaries
-//            _actions.Add("MyAction", MyAction); //sync
-          //  _asyncActions.Add("RuleCall", RuleCall); //async
+            //            _actions.Add("MyAction", MyAction); //sync
+            //  _asyncActions.Add("RuleCall", RuleCall); //async
             //_asyncActions.Add("SubWorkFlow", SubWorkFlow);
+            // _asyncActions.Add("GetFlag", SubWorkFlow);
+            _asyncActions.Add("SendEmail", SubWorkFlow); 
             //Register your conditions in _conditions and _asyncConditions dictionaries
             //    _conditions.Add("Action_Condition", Action_Condition); //sync
-            _asyncActions.Add("Logic_Notifications", Logic_Notifications); //async
-            _asyncConditions.Add("Logic_Decision", Logic_Decision);
-            //_conditions.Add("WaitForSubWorkFlow", WaitForSubWorkFlow);
+            _asyncActions.Add("RuleEngine_trigger", Logic_Notifications); //async
+           // _asyncConditions.Add("Logic_Decision", Logic_Decision);
+           // _conditions.Add("WaitForSubWorkFlow", WaitForSubWorkFlow);
+            _conditions.Add("Flag", CheckFlag);
+            _conditions.Add("Attribute", CheckAttribute);
+            _asyncConditions.Add("RuleEngine_Facts", Logic_Decision);
             
         }
    
@@ -57,6 +62,11 @@ namespace IngramWorkFlow.Business.Workflow
                 return true;
             return false;
         }
+        private void GetFlag(ProcessInstance processInstance, WorkflowRuntime runtime,
+          string actionParameter)
+        {
+            //Execute your synchronous code here
+        }
 
         private void MyAction(ProcessInstance processInstance, WorkflowRuntime runtime,
             string actionParameter)
@@ -64,43 +74,43 @@ namespace IngramWorkFlow.Business.Workflow
             //Execute your synchronous code here
         }
 
-        //private async Task<bool> SubWorkFlow(ProcessInstance processInstance, WorkflowRuntime runtime, string actionParameter, CancellationToken token)
-        //{
-        //    //Execute your asynchronous code here. You can use await in your code.
-        //    using (var client = new HttpClient())
-        //    {
-        //        dynamic parameter = JsonConvert.DeserializeObject(actionParameter);
-        //        client.DefaultRequestHeaders.Accept.Clear();
-        //        string url = string.Format("http://localhost:5000/createFlow?schemeCode={0}", parameter.Scheme);
-        //        client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-        //        var content = JsonConvert.SerializeObject(parameter.Input);
-        //        var stringContent = new StringContent(content, Encoding.UTF8, "application/json");
-        //        HttpResponseMessage response = await client.PostAsync(url,stringContent);
-        //         if (response != null)
-        //        {
-        //            string sta = await response.Content.ReadAsStringAsync();
-        //            processInstance.SetParameter("wait", sta);
-        //            return true;
-        //        }
+        private async Task<bool> SubWorkFlow(ProcessInstance processInstance, WorkflowRuntime runtime, string actionParameter, CancellationToken token)
+        {
+            //Execute your asynchronous code here. You can use await in your code.
+            using (var client = new HttpClient())
+            {
+                dynamic parameter = JsonConvert.DeserializeObject(actionParameter);
+                client.DefaultRequestHeaders.Accept.Clear();
+                string url = string.Format("http://localhost:5000/createFlow?schemeCode={0}", parameter.Scheme);
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                var content = JsonConvert.SerializeObject(parameter.Input);
+                var stringContent = new StringContent(content, Encoding.UTF8, "application/json");
+                HttpResponseMessage response = await client.PostAsync(url, stringContent);
+                if (response != null)
+                {
+                    string sta = await response.Content.ReadAsStringAsync();
+                    processInstance.SetParameter("wait", sta);
+                    return true;
+                }
 
-        //    }
+            }
 
-        //    return false;
-        //}
+            return false;
+        }
 
 
-        //private async Task RuleCall(ProcessInstance processInstance, WorkflowRuntime runtime, string actionParameter, CancellationToken token)
-        //{
-        //    using (var client = new HttpClient())
-        //    {
-        //        client.BaseAddress = new Uri("https://inferenceapi.azurewebsites.net/api/Inference");
-        //        client.DefaultRequestHeaders.Accept.Clear();
-        //        client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-        //        HttpResponseMessage response = await client.GetAsync("");
-        //        actionParameter = response.RequestMessage.Properties.Values.ToString();
-        //    }
-        //    //Execute your asynchronous code here. You can use await in your code.
-        //}
+        private async Task RuleCall(ProcessInstance processInstance, WorkflowRuntime runtime, string actionParameter, CancellationToken token)
+        {
+            using (var client = new HttpClient())
+            {
+                client.BaseAddress = new Uri("https://inferenceapi.azurewebsites.net/api/Inference");
+                client.DefaultRequestHeaders.Accept.Clear();
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                HttpResponseMessage response = await client.GetAsync("");
+                actionParameter = response.RequestMessage.Properties.Values.ToString();
+            }
+            //Execute your asynchronous code here. You can use await in your code.
+        }
         private async Task<bool> Logic_Notifications(ProcessInstance processInstance, WorkflowRuntime runtime, string actionParameter, CancellationToken token)
         {
             using (var client = new HttpClient())
@@ -119,33 +129,85 @@ namespace IngramWorkFlow.Business.Workflow
             }
             return false;
         }
-        //private bool WaitForSubWorkFlow(ProcessInstance processInstance, WorkflowRuntime runtime, string actionParameter)
-        //{
-        //    string stid = processInstance.GetParameter("wait").Value.ToString();
-        //    stid = stid.Replace("\"", string.Empty);
-        //    Guid id = new Guid();
-        //    var r = Guid.TryParse(stid,out id);
-        //    using (SqlConnection connection = new SqlConnection("Server=tcp:camsazure.database.windows.net,1433;Initial Catalog=camsdatabase;Persist Security Info=False;User ID=chanakya;Password=Jahnavi@01;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"))
-        //    {
-        //        while (true)
-        //        {
-        //            SqlCommand command = new SqlCommand(string.Format("SELECT [Status] FROM [dbo].[WorkflowProcessInstanceStatus] where id = '{0}'", id), connection);
-        //            command.Connection.Open();
-        //            SqlDataReader sqlDataReader = command.ExecuteReader();
-        //            while (sqlDataReader.Read())
-        //            {
-        //                var f = sqlDataReader["Status"].ToString();
-        //                if (f == "2")
-        //                {
-        //                    return true;
-        //                }
-        //                Console.WriteLine("wait");
-        //            }
-        //            sqlDataReader.Close();
-        //            command.Connection.Close();
-        //        }
-        //    }
-        //}
+        private bool CheckFlag(ProcessInstance processInstance, WorkflowRuntime runtime, string actionParameter)
+        {
+            string id = "WO001";
+            using (SqlConnection connection = new SqlConnection("Server=tcp:ingrampoc.database.windows.net,1433;Initial Catalog=Poc;Persist Security Info=False;User ID=chanakya;Password=Ingram123;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"))
+            {
+                SqlCommand command = new SqlCommand(string.Format("SELECT [Flags] FROM [dbo].[flags] where WorkorderID = '{0}'", id), connection);
+                command.Connection.Open();
+                SqlDataReader sqlDataReader = command.ExecuteReader();
+                while(sqlDataReader.Read())
+                {
+                    string src = sqlDataReader["Flags"].ToString();
+                    var source = JsonConvert.DeserializeObject<Dictionary<string, string>>(src);
+                    var des = JsonConvert.DeserializeObject<Dictionary<string, string>>(actionParameter);
+                    foreach(var k in des.Keys)
+                    {
+                        if(des[k] != source[k])
+                        {
+                            return false;
+                        }
+                    }
+                    return true;
+                }
+            }
+            return true;
+
+        }
+        private bool CheckAttribute(ProcessInstance processInstance, WorkflowRuntime runtime, string actionParameter)
+        {
+            string id = "WO001";
+            using (SqlConnection connection = new SqlConnection("Server=tcp:ingrampoc.database.windows.net,1433;Initial Catalog=Poc;Persist Security Info=False;User ID=chanakya;Password=Ingram123;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"))
+            {
+                SqlCommand command = new SqlCommand(string.Format("SELECT [Attributes] FROM [dbo].[flags] where WorkorderID = '{0}'", id), connection);
+                command.Connection.Open();
+                SqlDataReader sqlDataReader = command.ExecuteReader();
+                while (sqlDataReader.Read())
+                {
+                    string src = sqlDataReader["Attributes"].ToString();
+                    var source = JsonConvert.DeserializeObject<Dictionary<string, string>>(src);
+                    var des = JsonConvert.DeserializeObject<Dictionary<string, string>>(actionParameter);
+                    foreach (var k in des.Keys)
+                    {
+                        if (des[k] != source[k])
+                        {
+                            return false;
+                        }
+                    }
+                    return true;
+                }
+            }
+            return true;
+
+        }
+        private bool WaitForSubWorkFlow(ProcessInstance processInstance, WorkflowRuntime runtime, string actionParameter)
+        {
+            string stid = processInstance.GetParameter("wait").Value.ToString();
+            stid = stid.Replace("\"", string.Empty);
+            Guid id = new Guid();
+            var r = Guid.TryParse(stid, out id);
+            using (SqlConnection connection = new SqlConnection("Server=tcp:ingrampoc.database.windows.net,1433;Initial Catalog=Poc;Persist Security Info=False;User ID=chanakya;Password=Ingram123;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"))
+            {
+                while (true)
+                {
+                    SqlCommand command = new SqlCommand(string.Format("SELECT [Status] FROM [dbo].[WorkflowProcessInstanceStatus] where id = '{0}'", id), connection);
+                    command.Connection.Open();
+                    SqlDataReader sqlDataReader = command.ExecuteReader();
+                    while (sqlDataReader.Read())
+                    {
+                        var f = sqlDataReader["Status"].ToString();
+                        if (f == "2")
+                        {
+                            return true;
+                        }
+                        Console.WriteLine("wait");
+                    }
+                    sqlDataReader.Close();
+                    command.Connection.Close();
+                }
+            }
+        }
 
         #region Implementation of IWorkflowActionProvider
 

@@ -18,13 +18,13 @@
     }
 }
 
-<div style="width: 300px; float: left;">
+@*<div style="width: 300px; float: left;">
     <div class="ui menu">
-        <a href="/" class="item">@Html.Raw(folder == 0 ? "<b>All Requests</b>" : "All Requests")</a>
+        <a href="/" class="item">@Html.Raw(folder == 0 ? "<b>Tickets</b>" : "All Requests")</a>
         <a href="/Ticket/Inbox" class="item">@Html.Raw(folder == 1 ? "<b>Inbox</b>" : "Inbox")</a>
         <a href="/Ticket/Outbox" class="item">@Html.Raw(folder == 2 ? "<b>Outbox</b>" : "Outbox")</a>
     </div>
-</div>
+</div>*@
 
 <script>
     function ReCalcInbox() {

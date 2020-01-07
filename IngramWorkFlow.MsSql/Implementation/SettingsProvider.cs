@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using IngramWorkFlow.Business.DataAccess;
 using IngramWorkFlow.Business.Model;
 using IngramWorkFlow.MsSql;
+using System.Xml;
 
 namespace IngramWorkFlow.MsSql.Implementation
 {
@@ -46,6 +47,20 @@ namespace IngramWorkFlow.MsSql.Implementation
         public dynamic GetSchemes()
         {
             return _sqlContext.WorkflowSchemes.Select(x => new { Code = x.Code });
+        }
+        public dynamic GetActivities(string code)
+        {
+            List<string> activties = new List<String>();
+            var a = _sqlContext.WorkflowSchemes.First(c => c.Code == code);
+            XmlDocument xmlDoc = new XmlDocument();
+            xmlDoc.LoadXml(a.Scheme);
+            XmlNodeList nodeList = xmlDoc.SelectNodes("Process/Activities/Activity");
+            foreach(XmlNode node in nodeList)
+            {
+               // var attr = node.Attributes;
+                activties.Add(node.Attributes["Name"].Value);
+            }
+            return activties;
         }
     }
 }

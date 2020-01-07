@@ -10,7 +10,7 @@ using System.Threading;
 using AutoMapper;
 using IngramWorkFlow.Business.DataAccess;
 using Microsoft.AspNetCore.Mvc;
-
+using Newtonsoft.Json;
 
 namespace IngramWorkFlow.Controllers
 {
@@ -126,17 +126,32 @@ namespace IngramWorkFlow.Controllers
         [Route("createFlow")]
         public IActionResult postEdit([FromQuery]string schemeCode, [FromBody] TicketModel model)
         {
-            return Edit(null, null, model, schemeCode);
+           // return Edit(null);
+            return Edit(null, null, model, schemeCode,"");
         }
         [HttpPost]
-        public ActionResult Edit(Guid? Id,string button,TicketModel model, string schemeCode)
+        [Route("Command")]
+        public IActionResult postCommand([FromQuery]string commandName,[FromQuery] string userid,[FromBody] TicketModel  model)
+        {
+
+            var commands = WorkflowInit.Runtime.GetAvailableCommands(model.Id, userid);
+
+            var command =
+                commands.FirstOrDefault(
+                    c => c.CommandName.Equals(commandName, StringComparison.CurrentCultureIgnoreCase));
+            if (command == null)
+                return null;
+            return Edit(model.Id, commandName,model, "", userid);
+        }
+        [HttpPost]
+        public ActionResult Edit(Guid? Id,string button,TicketModel model, string schemeCode, string currentUser)
         {
          
             if (!ModelState.IsValid)
             {
                 return View(model);
             }
-
+            string json = JsonConvert.SerializeObject(model);
             Ticket doc = _mapper.Map<Ticket>(model);
 
             try
@@ -168,7 +183,7 @@ namespace IngramWorkFlow.Controllers
             
             if (button != "Save")
             {
-                ExecuteCommand(doc.Id, button, model);
+                ExecuteCommand(doc.Id, button, model,currentUser);
             }
             return RedirectToAction("Edit", new { doc.Id });
 
@@ -221,9 +236,9 @@ namespace IngramWorkFlow.Controllers
 
         }
 
-        private void ExecuteCommand(Guid id, string commandName, TicketModel document)
+        private void ExecuteCommand(Guid id, string commandName, TicketModel document, string currentUser)
         {
-            var currentUser = CurrentUserSettings.GetCurrentUser(HttpContext).ToString();
+          //  var currentUser = CurrentUserSettings.GetCurrentUser(HttpContext).ToString();
             
             if (commandName.Equals("SetState", StringComparison.InvariantCultureIgnoreCase))
             {

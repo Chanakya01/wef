@@ -15,9 +15,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using OptimaJet.Workflow.Core.Runtime;
-
-
-
+using Swashbuckle.AspNetCore.Swagger;
 
 namespace IngramWorkFlow
 {
@@ -39,7 +37,27 @@ namespace IngramWorkFlow
         {
             services.AddHttpContextAccessor();
             services.AddAutoMapper();
-
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc(
+                    "v3",
+                    new Info
+                    {
+                        Version = "v3",
+                        Title = "WF API",
+                        Description = "WF",
+                        TermsOfService = "None",
+                        Contact = new Contact() { Name = " API", Email = "contact@a.com", Url = "https://blueiq.cloudblue.com/" }
+                    });
+            });
+            services.AddCors(options =>
+            {
+                options.AddPolicy("CorsPolicy", asd => asd
+                .WithOrigins("http://localhost:4200", "http://localhost:4201")
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+                .AllowCredentials());
+            });
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
             // Create the container builder.
@@ -73,7 +91,12 @@ namespace IngramWorkFlow
                 app.UseExceptionHandler("/Home/Error");
                 app.UseHsts();
             }
-
+            app.UseCors("CorsPolicy");
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Workflow API V1");
+            });
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseCookiePolicy();

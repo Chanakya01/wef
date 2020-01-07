@@ -11,5 +11,6 @@ namespace IngramWorkFlow.Business.DataAccess
     {
         Settings GetSettings();
         dynamic GetSchemes();
+        dynamic GetActivities(string code);
     }
 }

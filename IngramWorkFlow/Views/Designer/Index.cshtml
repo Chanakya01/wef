@@ -25,7 +25,7 @@
     
   
 </form>
-@*<a href="javascript:onLoad()" class="ui secondary button">Load</a>*@
+<a href="javascript:onLoad()" class="ui secondary button">Load</a>
 <div id="wfdesigner" style="min-height:600px"></div>
 
 <script>var QueryString = function () {
@@ -50,8 +50,13 @@
         }
         return query_string;
     }();
-    document.getElementById('schemeName').value = QueryString.schemeName;
+    if (QueryString.Clone == "false") {
+        document.getElementById('schemeName').value = QueryString.schemeName;
+        document.getElementById('schemeName').disabled = true;
+    }
+    var customer = QueryString.Customer;
     var schemecode = QueryString.schemeName;
+    var master = QueryString.Master;
     var processid = QueryString.processid;
     var graphwidth = 1200;
     var graphminheight = 600;
@@ -70,7 +75,7 @@
         WorkflowDesignerConstants.FormMaxHeight = 600;
         wfdesigner = new WorkflowDesigner({
             name: 'simpledesigner',
-            apiurl: '/Designer/API',
+            apiurl: '/Designer/API?&Master=' + QueryString.Master + '&ControlType=' + QueryString.ControlType + '&ControlBody=' + QueryString.ControlBody,
             renderTo: 'wfdesigner',
             imagefolder: '/images/',
             graphwidth: graphwidth,
@@ -93,6 +98,7 @@
             wfdesigner.data = data;
             wfdesigner.render();
         }
+        
     }
 
     $(window).resize(function () {
@@ -168,12 +174,12 @@ function OnSave() {
 function OnNew() {
     wfdesigner.create();
     }
-    //function onLoad() {
-    //    debugger;
-    //    var scheme = document.getElementById('schemeName').value;
-    //    var p = { schemecode: scheme, processid: null, readonly: false };
-    //    if (wfdesigner.exists(p))
-    //        wfdesigner.load(p);
-    //    else
-    //        wfdesigner.create();
-    //}</script>
+    function onLoad() {
+        debugger;
+        var scheme = document.getElementById('schemeName').value;
+        var p = { schemecode: scheme, processid: null, readonly: false };
+        if (wfdesigner.exists(p))
+            wfdesigner.load(p);
+        else
+            wfdesigner.create();
+    }</script>
