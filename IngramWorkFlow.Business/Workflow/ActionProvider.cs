@@ -131,7 +131,7 @@ namespace IngramWorkFlow.Business.Workflow
         }
         private bool CheckFlag(ProcessInstance processInstance, WorkflowRuntime runtime, string actionParameter)
         {
-            string id = "WO001";
+            string id = "WO123";
             using (SqlConnection connection = new SqlConnection("Server=tcp:ingrampoc.database.windows.net,1433;Initial Catalog=Poc;Persist Security Info=False;User ID=chanakya;Password=Ingram123;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"))
             {
                 SqlCommand command = new SqlCommand(string.Format("SELECT [Flags] FROM [dbo].[flags] where WorkorderID = '{0}'", id), connection);
