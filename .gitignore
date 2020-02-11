@@ -261,3 +261,4 @@ __pycache__/
 *.pyc
 /IngramWorkFlow/Properties/PublishProfiles/IngramWorkFlow - FTP.pubxml
 /IngramWorkFlow/Properties/PublishProfiles
+/.VSCodeCounter
